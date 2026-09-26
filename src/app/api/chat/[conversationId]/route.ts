@@ -1,0 +1,1 @@
+import { NextResponse } from "next/server"; import { getConversation } from "@/lib/db"; export async function GET(_:Request,{params}:{params:Promise<{conversationId:string}>}){const {conversationId}=await params;const row=await getConversation(conversationId);return row?NextResponse.json(row):NextResponse.json({error:"Not found"},{status:404})}

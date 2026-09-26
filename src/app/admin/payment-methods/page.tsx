@@ -1,0 +1,1 @@
+import { AdminMethods } from "@/components/admin-methods"; import { listPaymentMethods } from "@/lib/db"; export default async function Page(){return <AdminMethods initial={await listPaymentMethods()}/>}

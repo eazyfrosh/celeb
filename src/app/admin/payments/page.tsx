@@ -1,0 +1,1 @@
+import { AdminPayments } from "@/components/admin-payments"; import { listPaymentRequests,listPayments } from "@/lib/db"; export default async function Page(){const [payments,requests]=await Promise.all([listPayments(),listPaymentRequests()]);return <AdminPayments initial={payments} initialRequests={requests}/>}

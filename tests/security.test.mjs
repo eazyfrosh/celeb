@@ -1,0 +1,4 @@
+import test from "node:test";import assert from "node:assert/strict";import {readFile} from "node:fs/promises";
+test("admin middleware protects dashboard and API routes",async()=>{const s=await readFile(new URL("../src/middleware.ts",import.meta.url),"utf8");assert.match(s,/\/admin\/:path\*/);assert.match(s,/\/api\/admin\/:path\*/);assert.match(s,/jwtVerify/)});
+test("payment submission is pending and duplicate hashes are rejected",async()=>{const s=await readFile(new URL("../src/lib/db.ts",import.meta.url),"utf8");assert.match(s,/status: "pending"/);assert.match(s,/DUPLICATE_HASH/)});
+test("public forms include rate limits",async()=>{for(const f of ["enquiries","chat","payments/submit"]){const s=await readFile(new URL(`../src/app/api/${f}/route.ts`,import.meta.url),"utf8");assert.match(s,/rateLimit/)}});

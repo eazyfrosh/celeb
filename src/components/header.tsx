@@ -1,0 +1,7 @@
+"use client";
+import Link from "next/link";
+import { Menu, X, ArrowUpRight } from "lucide-react";
+import { useState } from "react";
+
+const links = [["Talent","/talent"],["Services","/services"],["Foundation","/foundation"],["About","/about"],["FAQ","/faq"],["Contact","/contact"]];
+export function Header() { const [open,setOpen]=useState(false); return <header className="sticky top-0 z-40 border-b border-black/15 bg-[#f4f0e8]/90 backdrop-blur-xl"><div className="shell flex h-[72px] items-center justify-between gap-5"><Link href="/" className="text-xl font-black tracking-[-.07em]" aria-label="Velaire home">VELAIRE<span className="text-[#ff6b55]">●</span></Link><nav className="hidden items-center gap-6 lg:flex" aria-label="Main navigation">{links.map(([l,h])=><Link className="text-xs font-bold uppercase tracking-[.1em] hover:opacity-55" href={h} key={h}>{l}</Link>)}</nav><div className="hidden items-center gap-3 sm:flex"><Link href="/book" className="btn btn-dark">Start an enquiry <ArrowUpRight size={16}/></Link></div><button onClick={()=>setOpen(!open)} className="grid h-11 w-11 place-items-center rounded-full border border-black/20 lg:hidden" aria-expanded={open} aria-label="Toggle navigation">{open?<X/>:<Menu/>}</button></div>{open&&<nav className="shell grid gap-1 border-t border-black/15 py-4 lg:hidden">{links.map(([l,h])=><Link onClick={()=>setOpen(false)} className="py-3 text-lg font-bold" href={h} key={h}>{l}</Link>)}<Link href="/book" className="btn btn-lime mt-3">Start an enquiry</Link></nav>}</header> }

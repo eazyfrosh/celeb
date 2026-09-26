@@ -1,0 +1,1 @@
+import { NextRequest,NextResponse } from "next/server"; import { getContent,saveContent } from "@/lib/db"; export async function GET(){return NextResponse.json(await getContent())}export async function PUT(req:NextRequest){return NextResponse.json(await saveContent(await req.json()))}
