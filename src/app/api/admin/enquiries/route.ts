@@ -1,1 +1,1 @@
-import { NextResponse } from "next/server"; import { listEnquiries } from "@/lib/db"; export async function GET(){return NextResponse.json(await listEnquiries())}
+import { NextResponse } from "next/server"; import { listEnquiries } from "@/lib/db"; export const dynamic="force-dynamic"; export async function GET(){return NextResponse.json(await listEnquiries(),{headers:{"Cache-Control":"private, no-store, max-age=0"}})}

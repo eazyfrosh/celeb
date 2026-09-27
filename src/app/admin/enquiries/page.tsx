@@ -1,1 +1,1 @@
-import { AdminEnquiries } from "@/components/admin-enquiries"; import { listEnquiries } from "@/lib/db"; export default async function Page(){return <AdminEnquiries initial={await listEnquiries()}/>}
+import { AdminEnquiries } from "@/components/admin-enquiries"; import { listEnquiries } from "@/lib/db"; export const dynamic="force-dynamic"; export default async function Page(){return <AdminEnquiries initial={await listEnquiries()}/>}
