@@ -1,2 +1,41 @@
-import { NextRequest,NextResponse } from "next/server"; import { put } from "@vercel/blob"; import { rateLimit } from "@/lib/security";
-const allowed=["image/jpeg","image/png","image/webp","application/pdf"];export async function POST(req:NextRequest){const ip=req.headers.get("x-forwarded-for")?.split(",")[0]||"local";if(!await rateLimit(`upload:${ip}`,4,300))return NextResponse.json({error:"Too many uploads"},{status:429});const file=(await req.formData()).get("file");if(!(file instanceof File)||!allowed.includes(file.type)||file.size>5*1024*1024)return NextResponse.json({error:"Use JPG, PNG, WebP or PDF up to 5MB."},{status:400});const token=process.env.BLOB_PRIVATE_READ_WRITE_TOKEN;if(!token)return NextResponse.json({error:"Private proof storage is not configured."},{status:503});const blob=await put(`payment-proofs/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`,file,{access:"private",addRandomSuffix:false,token});return NextResponse.json({url:blob.url})}
+import { put } from "@vercel/blob";
+import { NextRequest, NextResponse } from "next/server";
+import { rateLimit } from "@/lib/security";
+
+const allowed = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+
+export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "local";
+  if (!(await rateLimit(`upload:${ip}`, 4, 300))) {
+    return NextResponse.json({ error: "Too many uploads" }, { status: 429 });
+  }
+
+  const file = (await req.formData()).get("file");
+  if (
+    !(file instanceof File) ||
+    !allowed.includes(file.type) ||
+    file.size > 5 * 1024 * 1024
+  ) {
+    return NextResponse.json(
+      { error: "Use JPG, PNG, WebP or PDF up to 5MB." },
+      { status: 400 },
+    );
+  }
+
+  const token = process.env.BLOB_PRIVATE_READ_WRITE_TOKEN;
+  const storeId = process.env.BLOB_PRIVATE_STORE_ID;
+  if (!token && !storeId) {
+    return NextResponse.json(
+      { error: "Private proof storage is not configured." },
+      { status: 503 },
+    );
+  }
+
+  const auth = token ? { token } : { storeId: storeId! };
+  const blob = await put(
+    `payment-proofs/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`,
+    file,
+    { access: "private", addRandomSuffix: false, ...auth },
+  );
+  return NextResponse.json({ url: blob.url });
+}

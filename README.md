@@ -18,7 +18,7 @@ Configure Firebase Admin variables in `.env.local`, then run `npm run setup:admi
 
 1. Import the repository into Vercel and set the Root Directory to `velaire`.
 2. Create a Firebase project and Firestore database. Add the three Firebase Admin server variables from a service account.
-3. Create a public Vercel Blob store for talent/QR media (`BLOB_READ_WRITE_TOKEN`) and a private store for payment proofs (`BLOB_PRIVATE_READ_WRITE_TOKEN`).
+3. Create a public Vercel Blob store for talent/QR media and connect it with prefix `BLOB_CELEB`; create a private store for payment proofs and connect it with prefix `BLOB_PRIVATE`. The resulting `BLOB_CELEB_STORE_ID` and `BLOB_PRIVATE_STORE_ID` use Vercel OIDC. Legacy read-write tokens remain supported for local development.
 4. Add `SESSION_SECRET` (32+ random bytes), `ADMIN_SETUP_KEY`, `NEXT_PUBLIC_APP_URL`, and Resend email variables.
 5. Optionally add Upstash Redis REST credentials for distributed rate limiting. This is strongly recommended for multi-instance production deployments.
 6. Deploy, create the first admin, verify notification delivery, then rotate/remove the setup key.
@@ -40,7 +40,7 @@ The build command is `npm run build`; the framework preset is Next.js.
 - Authorised talent names, biographies, categories and licensed images
 - Verified foundation name, legal status, programmes and disclosures
 - Business address, phone, support/booking emails, privacy policy and terms
-- Firebase Admin credentials, Vercel Blob token, Resend key/from-domain, session secret
+- Firebase Admin credentials, connected Vercel Blob stores, Resend key/from-domain, session secret
 - Optional Upstash Redis REST credentials
 - Verified payment networks and wallet addresses (the included addresses are deliberately invalid samples)
 - Approved payment request/invoice source and operational verification policy
