@@ -18,7 +18,7 @@ Configure Firebase Admin variables in `.env.local`, then run `npm run setup:admi
 
 1. Import the repository into Vercel and set the Root Directory to `velaire`.
 2. Create a Firebase project and Firestore database. Add the three Firebase Admin server variables from a service account.
-3. Create a Vercel Blob store and attach `BLOB_READ_WRITE_TOKEN`.
+3. Create a public Vercel Blob store for talent/QR media (`BLOB_READ_WRITE_TOKEN`) and a private store for payment proofs (`BLOB_PRIVATE_READ_WRITE_TOKEN`).
 4. Add `SESSION_SECRET` (32+ random bytes), `ADMIN_SETUP_KEY`, `NEXT_PUBLIC_APP_URL`, and Resend email variables.
 5. Optionally add Upstash Redis REST credentials for distributed rate limiting. This is strongly recommended for multi-instance production deployments.
 6. Deploy, create the first admin, verify notification delivery, then rotate/remove the setup key.
@@ -29,7 +29,7 @@ The build command is `npm run build`; the framework preset is Next.js.
 
 - Middleware verifies the signed, HTTP-only admin session for every `/admin/*` page and `/api/admin/*` route.
 - Public payloads are validated with Zod, honeypot protected and rate limited.
-- Uploads accept only JPG, PNG, WebP or PDF files up to 5MB and are stored in Vercel Blob. Consider private Blob access or malware scanning if proof files may contain sensitive data.
+- Public talent/QR uploads accept JPG, PNG or WebP. Payment proofs accept JPG, PNG, WebP or PDF and use a separate private Blob store; admins retrieve them through an authenticated, non-cacheable proxy. All uploads are limited to 5MB.
 - Enabled payment methods alone appear publicly. Network warnings are prominent, hashes are unique, and every submission starts as `pending`; screenshots and hashes never auto-confirm payment.
 - Payment decisions append an audit entry with actor, time, action and note.
 - Keep the Firebase service account, session secret and API keys server-side. Never prefix them with `NEXT_PUBLIC_`.
