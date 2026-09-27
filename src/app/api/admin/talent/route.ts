@@ -1,1 +1,34 @@
-import { NextRequest,NextResponse } from "next/server"; import { listTalents,saveTalent } from "@/lib/db"; import { z } from "zod"; const schema=z.object({id:z.string().optional(),slug:z.string().regex(/^[a-z0-9-]+$/),name:z.string().min(2),discipline:z.string().min(2),location:z.string().min(2),bio:z.string().min(10),image:z.string().url(),tags:z.array(z.string()),featured:z.boolean(),published:z.boolean()});export async function GET(){return NextResponse.json(await listTalents(true))}export async function POST(req:NextRequest){const p=schema.safeParse(await req.json());if(!p.success)return NextResponse.json({error:"Invalid profile",details:p.error.flatten()},{status:400});return NextResponse.json(await saveTalent({...p.data,id:p.data.id||crypto.randomUUID()}),{status:201})}
+import { revalidatePath } from "next/cache";
+import { NextRequest, NextResponse } from "next/server";
+import { listTalents, saveTalent } from "@/lib/db";
+import { talentSchema, talentValidationError } from "@/lib/talent-validation";
+
+export async function GET() {
+  return NextResponse.json(await listTalents(true));
+}
+
+export async function POST(req: NextRequest) {
+  const parsed = talentSchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: talentValidationError(parsed.error), details: parsed.error.flatten() },
+      { status: 400 },
+    );
+  }
+
+  const duplicate = (await listTalents(true)).some(
+    (talent) => talent.slug === parsed.data.slug,
+  );
+  if (duplicate) {
+    return NextResponse.json(
+      { error: "Another profile already uses this slug." },
+      { status: 409 },
+    );
+  }
+
+  const talent = await saveTalent({ ...parsed.data, id: crypto.randomUUID() });
+  revalidatePath("/");
+  revalidatePath("/talent");
+  revalidatePath("/book");
+  return NextResponse.json(talent, { status: 201 });
+}
