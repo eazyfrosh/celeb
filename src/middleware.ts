@@ -3,7 +3,7 @@ import { jwtVerify } from "jose";
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  if (path === "/admin/login" || path === "/api/admin/login") return NextResponse.next();
+  if (path === "/admin/login" || path === "/admin/recover" || path === "/api/admin/login") return NextResponse.next();
   const token = request.cookies.get("velaire_admin")?.value;
   try {
     if (!token) throw new Error("missing");
